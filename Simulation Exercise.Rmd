@@ -1,0 +1,191 @@
+---
+title: Investigate the Exponential Distribution in R and compare it with the Central
+  Limit Theorem
+author: "Charanjeet Dhawan"
+date: "16 September 2018"
+output: html_document
+---
+
+## Overview
+
+Here we will investigate the exponential distribution and compare it to the Central Limit Theorem. For this analysis, the lambda will be set to 0.2 for all of the simulations. This investigation will compare the distribution of averages of 40 exponentials over 1000 simulations.
+
+### Simulation 
+
+Set the simulation variables $\lambda$, exponentials, seed and number of simulation(noSim)
+
+```{r}
+
+ECHO=TRUE
+set.seed(12345)
+lambda = 0.2
+exponentials = 40
+noSim = 1000
+
+exponentialDistributions <- matrix(data = rexp(exponentials*noSim, lambda), nrow = noSim)
+exponentialDistributionMeans <- data.frame(means = apply(exponentialDistributions, 1, mean))
+
+```
+
+```{r}
+library(ggplot2)
+
+# Plot the Means
+
+ggplot(data = exponentialDistributionMeans, aes(x = means)) +
+    geom_histogram(aes(y= ..density..), binwidth=0.15, fill = "skyblue", color = "black") +
+    stat_function(fun = dnorm, args = list(mean = lambda^-1, sd = (lambda*sqrt(exponentials))^-1), size = 2) +
+    labs(title =" Plot of the Means", x = "Simulation Mean")
+```
+  
+
+
+## Q.1 Theoretical Means VS. Sample Means
+
+The expected mean $\mu$ of a exponential distribution of rate $\lambda$ is
+
+$\mu= \frac{1}{\lambda}$
+
+```{r}
+mu <- 1/lambda
+mu
+```
+
+Let $\bar X$ be the average sample mean of 1000 simulations of 40 randomly sampled exponential distributions.
+
+```{r}
+meanOfMeans <- mean(exponentialDistributionMeans$means)
+meanOfMeans
+```
+
+### Comparison
+
+Here we can see the expected mean and the avarage sample mean are very close.
+```{r}
+round(abs( meanOfMeans - mu), 4)
+```
+
+
+
+## Q.2 Theoretical Variance VS. Sample Variance
+
+The expected standard deviation $\sigma$ of a exponential distribution of rate $\lambda$ is
+
+$\sigma = \frac{1/\lambda}{\sqrt{no. of exponentials}}$
+
+```{r}
+
+sd <- sd <- 1/lambda/sqrt(exponentials)
+sd
+```
+
+The variance $Var$ of standard deviation $\sigma$ is
+
+$Var = \sigma^2$
+
+```{r}
+Var <- sd^2
+Var
+```
+
+Let $Var_x$ be the variance of the average sample mean of 1000 simulations of 40 randomly sampled exponential distribution, and $\sigma_x$ the corresponding standard deviation.
+
+```{r}
+sd_x <- sd(exponentialDistributionMeans$means)
+sd_x
+
+Var_x <- var(exponentialDistributionMeans$means)
+Var_x
+
+```
+
+### Comparison
+
+Here we can see that there is only a slight difference between the simulations sample variance and the exponential distribution theoretical variance.
+```{r}
+
+round(abs(Var_x - Var),4)
+```
+
+
+## Q.3 Distribution 
+Comparing the population means & standard deviation with a normal distribution of the expected values. Added lines for the calculated and expected means
+
+
+```{r}
+library(ggplot2)
+options(warn = -1)
+
+ggplot(data = exponentialDistributionMeans, aes(x = means)) + 
+  geom_histogram(binwidth=0.15, aes(y=..density..), fill = "skyblue", color = "black") + 
+  stat_function(fun = dnorm, args = list(mean = lambda^-1 , sd = (lambda*sqrt(exponentials))^-1), colour = "blue", size=1) +
+  geom_density(color = "red",size = 1) +
+  geom_vline(xintercept = mu, size=1, colour="red") + 
+  geom_vline(xintercept = meanOfMeans, size=1, colour="blue") +
+  scale_x_continuous(breaks=seq(mu-3,mu+3,1), limits=c(mu-3,mu+3)) +
+  labs(title =" Distribution of Means", x = "means") 
+
+```
+
+Here we can see from the graph, the calculated distribution of means of random sampled exponantial distributions, overlaps quite nice with the normal distribution with the expected values based on the given lamba.
+
+
+#### So we can say that the distribution is approximately normal.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
